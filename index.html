@@ -3,129 +3,383 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buscador de Cuentas</title>
-  <!-- Estilos con Tailwind CSS -->
+  <title>𝖲𝖺𝗆𝗀 𝖲𝗂𝗍𝖾 : 𝖥𝗈𝗋 𝖴𝗌𝖾𝗋𝗌</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* Estilos personalizados adicionales */
     body {
-      background-color: #0f172a;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0f19;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
     }
-    .account-card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+
+    .glass-card {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .account-card:hover {
-      transform: translateY(-2px);
+
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .search-input {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
       border-color: #38bdf8;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
     }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen p-4 md:p-8">
-  <div class="max-w-5xl mx-auto">
-    
-    <!-- Encabezado -->
-    <header class="mb-8 text-center md:text-left">
-      <h1 class="text-3xl md:text-4xl font-extrabold text-sky-400 tracking-tight">
-        Biblioteca de Cuentas
-      </h1>
-      <p class="text-slate-400 mt-1">
-        Filtra y encuentra cuentas disponibles escribiendo el nombre del juego.
-      </p>
-    </header>
+<body class="text-slate-100 min-h-screen pb-12">
 
-    <!-- Bar de Búsqueda -->
-    <div class="flex flex-col sm:flex-row gap-3 mb-8">
-      <input 
-        type="text" 
-        id="searchInput" 
-        placeholder="Escribe un juego (Ej: GTA V, Rust, Portal)..." 
-        class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-5 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
-        onkeyup="if(event.key === 'Enter') buscarCuentas()"
-      >
-      <button 
-        onclick="buscarCuentas()" 
-        class="bg-sky-500 hover:bg-sky-600 font-semibold px-8 py-3 rounded-xl transition-colors shadow-lg shadow-sky-500/20 active:scale-95"
-      >
-        Buscar
-      </button>
+  <!-- Navbar / Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-50 mb-8">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-gradient-to-tr from-sky-500 to-indigo-500 p-2.5 rounded-xl shadow-lg shadow-sky-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 0121 9z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white">
+            𝖲𝖺𝗆𝗀 𝖲𝗂𝗍𝖾 : 𝖥𝗈𝗋 𝖴𝗌𝖾𝗋𝗌
+          </h1>
+          <p class="text-xs text-sky-400 font-medium">Buscador Oficial de Cuentas</p>
+        </div>
+      </div>
+
+      <!-- Botones de Acción (Discord + Botón Booster Mejorado) -->
+      <div class="flex items-center space-x-3">
+        <!-- Botón de Discord -->
+        <a href="https://discord.gg/AT9Ypy2Vcc" target="_blank" class="flex items-center space-x-2 bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white text-indigo-300 font-semibold px-3.5 py-2 rounded-xl text-xs transition-all shadow-lg">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 127.14 96.36">
+            <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c2.64-27.38-4.51-51.11-20.08-72.15ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.92,53.87,53,48.8,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.92,96.1,53,91.08,65.69,84.69,65.69Z"/>
+          </svg>
+          <span class="hidden sm:inline">Discord</span>
+        </a>
+
+        <!-- Botón Verificar Booster Con Estilo Neón VIP -->
+        <button 
+          id="discordLoginBtn" 
+          onclick="loginDiscord()" 
+          class="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl group bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-500 group-hover:from-purple-600 group-hover:to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 active:scale-95 cursor-pointer"
+        >
+          <span class="relative px-3.5 py-2 transition-all ease-in duration-75 bg-slate-950/80 rounded-[10px] group-hover:bg-opacity-0 flex items-center space-x-2">
+            <svg class="w-4 h-4 text-pink-400 group-hover:text-white transition-colors animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L2 9.5L12 22L22 9.5L12 2Z" />
+            </svg>
+            <span class="tracking-wide">Verificar Booster</span>
+            <span class="bg-pink-500/20 text-pink-300 text-[9px] px-1.5 py-0.5 rounded-full border border-pink-500/30 uppercase group-hover:bg-white/20 group-hover:text-white group-hover:border-transparent">0s VIP</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4">
+    
+    <!-- Hero / Buscador -->
+    <div class="max-w-2xl mx-auto text-center mb-8">
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight">
+        Catálogo de Cuentas
+      </h2>
+      <p class="text-slate-400 text-sm sm:text-base mb-6">
+        Selecciona un juego o busca tus títulos favoritos.
+      </p>
+
+      <div class="relative flex items-center mb-6">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Busca un juego (ej: GTA V, Roblox, Far Cry)..." 
+          class="search-input w-full rounded-2xl py-4 pl-12 pr-28 text-white placeholder-slate-500 text-sm sm:text-base focus:outline-none"
+          onkeyup="if(event.key === 'Enter') buscarCuentas()"
+        >
+        <svg class="w-5 h-5 text-slate-500 absolute left-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <button 
+          onclick="buscarCuentas()" 
+          class="absolute right-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all shadow-md active:scale-95 cursor-pointer"
+        >
+          Buscar
+        </button>
+      </div>
+
+      <!-- Sección Desplegable de Categorías -->
+      <details class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-left shadow-lg">
+        <summary class="font-bold text-sky-400 cursor-pointer flex items-center justify-between text-sm sm:text-base select-none">
+          <span class="flex items-center space-x-2">
+            <span>🎮</span>
+            <span>Explorar Categorías de Juegos (Más disponibles primero)</span>
+          </span>
+          <span class="text-xs text-slate-500 font-normal">Clic para desplegar ▼</span>
+        </summary>
+        <div id="categoriasContainer" class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-800">
+          <p class="text-xs text-slate-500">Cargando categorías...</p>
+        </div>
+      </details>
+
     </div>
 
-    <!-- Contenedor de Resultados -->
-    <div id="resultados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
-  </div>
+    <!-- Contenedor de Cuentas -->
+    <div id="resultados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
+  </main>
+
+  <!-- AQUÍ ESTÁ EL SCRIPT DE JAVASCRIPT -->
   <script>
-    // URL de tu API en Render
     const API_URL = "https://api-cuentas-ibva.onrender.com/api/cuentas/buscar";
+    
+    // --- Configuración de Discord OAuth2 & Booster ---
+    const CLIENT_ID = "TU_CLIENT_ID_DISCORD"; // <--- Pon aquí tu Client ID de Discord
+    const REDIRECT_URI = encodeURIComponent("https://mutenme.github.io/");
 
-    async function buscarCuentas() {
-      const query = document.getElementById("searchInput").value;
-      const resContainer = document.getElementById("resultados");
-      
-      resContainer.innerHTML = `
-        <div class="col-span-full text-center py-10 text-slate-400">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-sky-400 mb-2"></div>
-          <p>Cargando cuentas...</p>
-        </div>
-      `;
+    const COOLDOWN_SEGUNDOS = 20; 
+    let enCooldown = false;
+    let esBooster = false; // Cambiará a TRUE si la verificación da positivo
 
-      try {
-        const response = await fetch(`${API_URL}?juego=${encodeURIComponent(query)}`);
-        const data = await response.json();
+    let todasLasCuentas = [];
 
-        if (!data.cuentas || data.cuentas.length === 0) {
-          resContainer.innerHTML = `
-            <div class="col-span-full text-center py-10 text-slate-500 bg-slate-800/40 rounded-xl border border-slate-800">
-              <p class="text-lg font-medium">No se encontraron cuentas.</p>
-              <p class="text-sm text-slate-600 mt-1">Prueba buscando otro juego.</p>
-            </div>
-          `;
-          return;
+    // Redirección al Login de Discord
+    function loginDiscord() {
+      if (!CLIENT_ID || CLIENT_ID === "TU_CLIENT_ID_DISCORD") {
+        alert("Debes configurar el CLIENT_ID de Discord en el código de index.html.");
+        return;
+      }
+      const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify`;
+      window.location.href = discordAuthUrl;
+    }
+
+    // Verificar si el usuario regresa de autorizar en Discord
+    async function chequearEstadoBooster() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+
+      if (code) {
+        // Limpia el código de la URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        try {
+          const res = await fetch(`https://api-cuentas-ibva.onrender.com/api/auth/discord?code=${code}`);
+          const data = await res.json();
+
+          if (data.es_booster) {
+            esBooster = true;
+            const btn = document.getElementById("discordLoginBtn");
+            btn.className = "relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 shadow-lg shadow-emerald-500/20";
+            btn.innerHTML = `
+              <span class="px-3.5 py-2 bg-slate-950/90 rounded-[10px] text-emerald-400 flex items-center space-x-2">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>⚡ VIP Booster Activo (0s)</span>
+              </span>
+            `;
+            alert(`¡Bienvenido ${data.usuario}! Como Booster del servidor tienes 0s de cooldown.`);
+          } else {
+            alert(`Hola ${data.usuario || 'usuario'}. No detectamos un Boost activo en el servidor. El cooldown se mantiene en 20s.`);
+          }
+        } catch (e) {
+          console.error("Error al verificar status de booster:", e);
         }
-
-        resContainer.innerHTML = data.cuentas.map(c => `
-          <div class="account-card p-5 rounded-2xl shadow-md">
-            <div class="mb-3">
-              <span class="text-xs font-semibold text-sky-400 uppercase tracking-wider">Usuario</span>
-              <div class="font-mono bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 text-slate-200 mt-1 select-all break-all">
-                ${c.usuario}
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <span class="text-xs font-semibold text-sky-400 uppercase tracking-wider">Contraseña</span>
-              <div class="font-mono bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 text-slate-200 mt-1 select-all break-all">
-                ${c.password}
-              </div>
-            </div>
-
-            <div>
-              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Juegos incluidos:</span>
-              <div class="flex flex-wrap gap-1.5">
-                ${c.juegos.map(j => `
-                  <span class="bg-sky-950/80 text-sky-300 border border-sky-800/40 text-xs px-2.5 py-1 rounded-md font-medium">
-                    ${j}
-                  </span>
-                `).join('')}
-              </div>
-            </div>
-          </div>
-        `).join('');
-
-      } catch (err) {
-        resContainer.innerHTML = `
-          <div class="col-span-full text-center py-10 text-red-400 bg-red-950/20 rounded-xl border border-red-900/40">
-            <p>Error al conectar con el servidor.</p>
-          </div>
-        `;
       }
     }
 
-    // Carga inicial
-    buscarCuentas();
+    // Cargar cuentas iniciales
+    async function cargarTodasLasCuentas() {
+      try {
+        const response = await fetch(`${API_URL}?juego=`);
+        const data = await response.json();
+        todasLasCuentas = data.cuentas || [];
+        
+        generarCategorias();
+        mostrarCuentas(todasLasCuentas);
+      } catch (err) {
+        console.error("Error al cargar cuentas iniciales", err);
+      }
+    }
+
+    function generarCategorias() {
+      const contexJuegos = {};
+
+      todasLasCuentas.forEach(c => {
+        c.juegos.forEach(j => {
+          const nombreLimpio = j.trim();
+          if (nombreLimpio) {
+            contexJuegos[nombreLimpio] = (contexJuegos[nombreLimpio] || 0) + 1;
+          }
+        });
+      });
+
+      const categoriasOrdenadas = Object.entries(contexJuegos).sort((a, b) => b[1] - a[1]);
+      const catContainer = document.getElementById("categoriasContainer");
+      
+      if (categoriasOrdenadas.length === 0) {
+        catContainer.innerHTML = `<span class="text-xs text-slate-500">No hay categorías disponibles.</span>`;
+        return;
+      }
+
+      catContainer.innerHTML = categoriasOrdenadas.map(([juego, cantidad]) => `
+        <button 
+          onclick="filtrarPorCategoria('${juego}')" 
+          class="bg-slate-800/80 hover:bg-sky-500/20 hover:border-sky-500/40 border border-slate-700/60 text-slate-300 hover:text-sky-300 text-xs px-3 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer"
+        >
+          <span>${juego}</span>
+          <span class="bg-slate-900 text-sky-400 font-bold text-[10px] px-1.5 py-0.5 rounded-md">${cantidad}</span>
+        </button>
+      `).join('');
+    }
+
+    function filtrarPorCategoria(juego) {
+      document.getElementById("searchInput").value = juego;
+      buscarCuentas();
+    }
+
+    async function buscarCuentas() {
+      const query = document.getElementById("searchInput").value.toLowerCase().trim();
+      const resContainer = document.getElementById("resultados");
+      
+      resContainer.innerHTML = `
+        <div class="col-span-full text-center py-16">
+          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-slate-700 border-t-sky-400 mb-3"></div>
+          <p class="text-slate-400 font-medium text-sm">Buscando cuentas...</p>
+        </div>
+      `;
+
+      const filtradas = todasLasCuentas.filter(c => 
+        c.juegos.some(j => j.toLowerCase().includes(query)) ||
+        c.usuario.toLowerCase().includes(query)
+      );
+
+      mostrarCuentas(filtradas);
+    }
+
+    function mostrarCuentas(cuentas) {
+      const resContainer = document.getElementById("resultados");
+
+      if (!cuentas || cuentas.length === 0) {
+        resContainer.innerHTML = `
+          <div class="col-span-full text-center py-16 bg-slate-900/40 rounded-3xl border border-slate-800">
+            <svg class="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-lg font-semibold text-slate-300">Sin resultados disponibles</p>
+            <p class="text-xs text-slate-500 mt-1">Prueba con otra categoría o nombre.</p>
+          </div>
+        `;
+        return;
+      }
+
+      resContainer.innerHTML = cuentas.map((c, index) => {
+        const primerJuego = c.juegos[0] || "Cuenta Multijuego";
+        const masJuegos = c.juegos.slice(1);
+
+        return `
+          <details class="glass-card rounded-2xl overflow-hidden group">
+            <summary class="p-5 flex items-center justify-between cursor-pointer select-none list-none hover:bg-slate-800/40 transition-colors">
+              <div class="flex items-center space-x-3">
+                <div class="bg-sky-500/10 border border-sky-500/20 p-2 rounded-xl text-sky-400">
+                  🎮
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-sky-300 transition-colors">
+                    ${primerJuego}
+                  </h3>
+                  <p class="text-[11px] text-slate-400">
+                    ${masJuegos.length > 0 ? `+${masJuegos.length} juegos extras incluidos` : 'Cuenta individual'}
+                  </p>
+                </div>
+              </div>
+              <span class="text-xs text-sky-400 font-semibold bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">
+                Ver Datos ▼
+              </span>
+            </summary>
+
+            <div class="p-5 pt-2 border-t border-slate-800/80 bg-slate-950/40">
+              ${masJuegos.length > 0 ? `
+                <div class="mb-4">
+                  <span class="text-[10px] uppercase font-bold text-slate-500 block mb-1">Otros juegos en la cuenta:</span>
+                  <div class="flex flex-wrap gap-1">
+                    ${masJuegos.map(j => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md">${j}</span>`).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <div class="space-y-3">
+                <div>
+                  <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Usuario</label>
+                  <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
+                    <span class="font-mono text-xs text-slate-200 truncate pr-2 select-all">${c.usuario}</span>
+                    <button onclick="copiarTexto('${c.usuario}', this)" class="text-slate-400 hover:text-sky-400 p-1 cursor-pointer" title="Copiar usuario">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Contraseña</label>
+                  <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
+                    <span class="font-mono text-xs text-slate-200 truncate pr-2 select-all">${c.password}</span>
+                    <button onclick="copiarTexto('${c.password}', this)" class="text-slate-400 hover:text-sky-400 p-1 cursor-pointer" title="Copiar contraseña">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </details>
+        `;
+      }).join('');
+    }
+
+    // Lógica de Copiado y Cooldown con Bypass Booster
+    function copiarTexto(texto, btn) {
+      if (esBooster) {
+        navigator.clipboard.writeText(texto);
+        const iconOriginal = btn.innerHTML;
+        btn.innerHTML = `<span class="text-xs text-emerald-400 font-bold">¡Copiado!</span>`;
+        setTimeout(() => btn.innerHTML = iconOriginal, 1000);
+        return;
+      }
+
+      if (enCooldown) {
+        alert("⏱️ Debes esperar a que termine el cooldown para volver a copiar (O verifica tu Boost de Discord).");
+        return;
+      }
+
+      navigator.clipboard.writeText(texto);
+      enCooldown = true;
+
+      let tiempoRestante = COOLDOWN_SEGUNDOS;
+      const iconOriginal = btn.innerHTML;
+
+      const intervalo = setInterval(() => {
+        btn.innerHTML = `<span class="text-[10px] text-amber-400 font-bold">${tiempoRestante}s</span>`;
+        
+        if (tiempoRestante <= 0) {
+          clearInterval(intervalo);
+          btn.innerHTML = iconOriginal;
+          enCooldown = false;
+        }
+        tiempoRestante--;
+      }, 1000);
+    }
+
+    // Inicialización al cargar la página
+    chequearEstadoBooster();
+    cargarTodasLasCuentas();
   </script>
 </body>
 </html>
