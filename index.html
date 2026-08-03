@@ -1,12 +1,131 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAMG site for users</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Cuentas</title>
+  <!-- Estilos con Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Estilos personalizados adicionales */
+    body {
+      background-color: #0f172a;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    .account-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .account-card:hover {
+      transform: translateY(-2px);
+      border-color: #38bdf8;
+    }
+  </style>
 </head>
-<body>
-    <h1>𝖲𝖺𝗆𝗀 𝖲𝗂𝗍𝖾 : 𝖥𝗈𝗋 𝖴𝗌𝖾𝗋𝗌</h1>
+<body class="text-slate-100 min-h-screen p-4 md:p-8">
+  <div class="max-w-5xl mx-auto">
+    
+    <!-- Encabezado -->
+    <header class="mb-8 text-center md:text-left">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-sky-400 tracking-tight">
+        Biblioteca de Cuentas
+      </h1>
+      <p class="text-slate-400 mt-1">
+        Filtra y encuentra cuentas disponibles escribiendo el nombre del juego.
+      </p>
+    </header>
+
+    <!-- Bar de Búsqueda -->
+    <div class="flex flex-col sm:flex-row gap-3 mb-8">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Escribe un juego (Ej: GTA V, Rust, Portal)..." 
+        class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-5 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+        onkeyup="if(event.key === 'Enter') buscarCuentas()"
+      >
+      <button 
+        onclick="buscarCuentas()" 
+        class="bg-sky-500 hover:bg-sky-600 font-semibold px-8 py-3 rounded-xl transition-colors shadow-lg shadow-sky-500/20 active:scale-95"
+      >
+        Buscar
+      </button>
+    </div>
+
+    <!-- Contenedor de Resultados -->
+    <div id="resultados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+  </div>
+
+  <script>
+    // URL de tu API en Render
+    const API_URL = "https://api-cuentas-ibva.onrender.com/api/cuentas/buscar";
+
+    async function buscarCuentas() {
+      const query = document.getElementById("searchInput").value;
+      const resContainer = document.getElementById("resultados");
+      
+      resContainer.innerHTML = `
+        <div class="col-span-full text-center py-10 text-slate-400">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-sky-400 mb-2"></div>
+          <p>Cargando cuentas...</p>
+        </div>
+      `;
+
+      try {
+        const response = await fetch(`${API_URL}?juego=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        if (!data.cuentas || data.cuentas.length === 0) {
+          resContainer.innerHTML = `
+            <div class="col-span-full text-center py-10 text-slate-500 bg-slate-800/40 rounded-xl border border-slate-800">
+              <p class="text-lg font-medium">No se encontraron cuentas.</p>
+              <p class="text-sm text-slate-600 mt-1">Prueba buscando otro juego.</p>
+            </div>
+          `;
+          return;
+        }
+
+        resContainer.innerHTML = data.cuentas.map(c => `
+          <div class="account-card p-5 rounded-2xl shadow-md">
+            <div class="mb-3">
+              <span class="text-xs font-semibold text-sky-400 uppercase tracking-wider">Usuario</span>
+              <div class="font-mono bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 text-slate-200 mt-1 select-all break-all">
+                ${c.usuario}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <span class="text-xs font-semibold text-sky-400 uppercase tracking-wider">Contraseña</span>
+              <div class="font-mono bg-slate-900/80 p-2.5 rounded-lg border border-slate-700/60 text-slate-200 mt-1 select-all break-all">
+                ${c.password}
+              </div>
+            </div>
+
+            <div>
+              <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Juegos incluidos:</span>
+              <div class="flex flex-wrap gap-1.5">
+                ${c.juegos.map(j => `
+                  <span class="bg-sky-950/80 text-sky-300 border border-sky-800/40 text-xs px-2.5 py-1 rounded-md font-medium">
+                    ${j}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        resContainer.innerHTML = `
+          <div class="col-span-full text-center py-10 text-red-400 bg-red-950/20 rounded-xl border border-red-900/40">
+            <p>Error al conectar con el servidor.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Carga inicial
+    buscarCuentas();
+  </script>
 </body>
 </html>
