@@ -69,10 +69,10 @@
         <button 
           id="discordLoginBtn" 
           onclick="loginDiscord()" 
-          class="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl group bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-500 hover:shadow-purple-500/40 transition-all duration-300 active:scale-95 cursor-pointer"
+          class="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl group bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-500 group-hover:from-purple-600 group-hover:to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 active:scale-95 cursor-pointer"
         >
           <span class="relative px-3.5 py-2 transition-all ease-in duration-75 bg-slate-950/80 rounded-[10px] group-hover:bg-opacity-0 flex items-center space-x-2">
-            <svg class="w-4 h-4 text-pink-400 group-hover:text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-pink-400 group-hover:text-white transition-colors animate-pulse" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2L2 9.5L12 22L22 9.5L12 2Z" />
             </svg>
             <span class="tracking-wide">Verificar Booster</span>
@@ -113,12 +113,11 @@
         </button>
       </div>
 
-      <!-- Categorías -->
       <details class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-left shadow-lg">
         <summary class="font-bold text-sky-400 cursor-pointer flex items-center justify-between text-sm sm:text-base select-none">
           <span class="flex items-center space-x-2">
             <span>🎮</span>
-            <span>Explorar Categorías de Juegos</span>
+            <span>Explorar Categorías de Juegos (Más disponibles primero)</span>
           </span>
           <span class="text-xs text-slate-500 font-normal">Clic para desplegar ▼</span>
         </summary>
@@ -170,10 +169,10 @@
             `;
             alert(`¡Bienvenido ${data.usuario}! Tienes 0s de cooldown.`);
           } else {
-            alert(`Hola ${data.usuario || 'usuario'}. No detectamos Boost en el servidor. Cooldown de 20s activo.`);
+            alert(`Hola ${data.usuario || 'usuario'}. No detectamos Boost en el servidor. Cooldown activo.`);
           }
         } catch (e) {
-          console.error("Error al verificar Booster:", e);
+          console.error("Error al verificar status de booster:", e);
         }
       }
     }
@@ -187,12 +186,13 @@
         generarCategorias();
         mostrarCuentas(todasLasCuentas);
       } catch (err) {
-        console.error("Error al cargar cuentas:", err);
+        console.error("Error al cargar cuentas iniciales", err);
       }
     }
 
     function generarCategorias() {
       const contexJuegos = {};
+
       todasLasCuentas.forEach(c => {
         c.juegos.forEach(j => {
           const nombreLimpio = j.trim();
@@ -211,7 +211,7 @@
       catContainer.innerHTML = categoriasOrdenadas.map(([juego, cantidad]) => `
         <button 
           onclick="filtrarPorCategoria('${juego}')" 
-          class="bg-slate-800/80 hover:bg-sky-500/20 border border-slate-700/60 text-slate-300 text-xs px-3 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer"
+          class="bg-slate-800/80 hover:bg-sky-500/20 hover:border-sky-500/40 border border-slate-700/60 text-slate-300 hover:text-sky-300 text-xs px-3 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer"
         >
           <span>${juego}</span>
           <span class="bg-slate-900 text-sky-400 font-bold text-[10px] px-1.5 py-0.5 rounded-md">${cantidad}</span>
@@ -240,50 +240,81 @@
         resContainer.innerHTML = `
           <div class="col-span-full text-center py-16 bg-slate-900/40 rounded-3xl border border-slate-800">
             <p class="text-lg font-semibold text-slate-300">Sin resultados disponibles</p>
+            <p class="text-xs text-slate-500 mt-1">Prueba con otra categoría o nombre.</p>
           </div>
         `;
         return;
       }
 
-      resContainer.innerHTML = cuentas.map(c => {
+      resContainer.innerHTML = cuentas.map((c) => {
         const primerJuego = c.juegos[0] || "Cuenta Multijuego";
+        const masJuegos = c.juegos.slice(1);
 
         return `
-          <div class="glass-card rounded-2xl overflow-hidden p-5 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center space-x-3 mb-4">
-                <div class="bg-sky-500/10 border border-sky-500/20 p-2.5 rounded-xl text-sky-400">🎮</div>
+          <details class="glass-card rounded-2xl overflow-hidden group">
+            <summary class="p-5 flex items-center justify-between cursor-pointer select-none list-none hover:bg-slate-800/40 transition-colors">
+              <div class="flex items-center space-x-3">
+                <div class="bg-sky-500/10 border border-sky-500/20 p-2 rounded-xl text-sky-400">🎮</div>
                 <div>
-                  <h3 class="font-bold text-white text-base">${primerJuego}</h3>
-                  <p class="text-xs text-slate-400">Usuario: <span class="font-mono text-sky-300">${c.usuario}</span></p>
+                  <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-sky-300 transition-colors">
+                    ${primerJuego}
+                  </h3>
+                  <p class="text-[11px] text-slate-400">
+                    ${masJuegos.length > 0 ? `+${masJuegos.length} juegos extras incluidos` : 'Cuenta individual'}
+                  </p>
+                </div>
+              </div>
+              <span class="text-xs text-sky-400 font-semibold bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">
+                Ver Datos ▼
+              </span>
+            </summary>
+
+            <div class="p-5 pt-2 border-t border-slate-800/80 bg-slate-950/40">
+              ${masJuegos.length > 0 ? `
+                <div class="mb-4">
+                  <span class="text-[10px] uppercase font-bold text-slate-500 block mb-1">Otros juegos en la cuenta:</span>
+                  <div class="flex flex-wrap gap-1">
+                    ${masJuegos.map(j => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md">${j}</span>`).join('')}
+                  </div>
+                </div>
+              ` : ''}
+
+              <div class="space-y-3">
+                <div>
+                  <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Usuario</label>
+                  <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
+                    <span class="font-mono text-xs text-slate-200 truncate pr-2 select-all">${c.usuario}</span>
+                    <button onclick="copiarTexto('${c.usuario}', this)" class="text-slate-400 hover:text-sky-400 p-1 cursor-pointer" title="Copiar usuario">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Contraseña</label>
+                  <div id="pass-container-${c.id}">
+                    <button 
+                      id="btn-revelar-${c.id}"
+                      onclick="revelarPassword(${c.id})" 
+                      class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+                    >
+                      🔓 Obtener Contraseña
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              <!-- Área donde se revela la Contraseña -->
-              <div id="box-pass-${c.id}" class="bg-slate-950 border border-slate-800 rounded-xl p-3 text-center mb-4">
-                <span class="text-xs text-slate-500 italic">Contraseña oculta y protegida</span>
-              </div>
             </div>
-
-            <button 
-              id="btn-revelar-${c.id}" 
-              onclick="solicitarRevelar(${c.id})" 
-              class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md active:scale-95 cursor-pointer"
-            >
-              🔓 Revelar Contraseña
-            </button>
-          </div>
+          </details>
         `;
       }).join('');
     }
 
-    // Petición Segura a la API en Render
-    async function solicitarRevelar(cuentaId) {
+    // Solicitar contraseña a Render
+    async function revelarPassword(cuentaId) {
       const btn = document.getElementById(`btn-revelar-${cuentaId}`);
-      const boxPass = document.getElementById(`box-pass-${cuentaId}`);
-
       btn.disabled = true;
-      btn.innerText = "Verificando en servidor...";
+      btn.innerText = "Solicitando...";
 
       try {
         const response = await fetch(`${API_BASE}/cuentas/revelar`, {
@@ -298,26 +329,33 @@
         const data = await response.json();
 
         if (response.ok && data.success) {
-          // Servidor autorizó la entrega
-          boxPass.innerHTML = `
-            <div class="flex items-center justify-between">
-              <span class="font-mono text-xs text-emerald-400 font-bold select-all">${data.password}</span>
-              <button onclick="navigator.clipboard.writeText('${data.password}')" class="text-slate-400 hover:text-sky-400 text-xs">Copiar</button>
+          const container = document.getElementById(`pass-container-${cuentaId}`);
+          container.innerHTML = `
+            <div class="flex items-center justify-between bg-slate-950 border border-emerald-500/40 rounded-xl px-3 py-2">
+              <span class="font-mono text-xs text-emerald-400 truncate pr-2 select-all">${data.password}</span>
+              <button onclick="copiarTexto('${data.password}', this)" class="text-slate-400 hover:text-emerald-400 p-1 cursor-pointer" title="Copiar contraseña">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+              </button>
             </div>
           `;
-          btn.innerText = "✅ Contraseña Entregada";
-          btn.className = "w-full bg-slate-800 text-slate-500 font-bold py-2.5 rounded-xl text-xs cursor-not-allowed";
         } else {
-          alert(data.detail || "Error al solicitar la contraseña.");
+          alert(data.detail || "Debes esperar antes de obtener otra contraseña.");
           btn.disabled = false;
-          btn.innerText = "🔓 Revelar Contraseña";
+          btn.innerText = "🔓 Obtener Contraseña";
         }
       } catch (err) {
         console.error(err);
-        alert("Ocurrió un error al conectar con el servidor.");
+        alert("Error de conexión al servidor.");
         btn.disabled = false;
-        btn.innerText = "🔓 Revelar Contraseña";
+        btn.innerText = "🔓 Obtener Contraseña";
       }
+    }
+
+    function copiarTexto(texto, btn) {
+      navigator.clipboard.writeText(texto);
+      const iconOriginal = btn.innerHTML;
+      btn.innerHTML = `<span class="text-[10px] text-emerald-400 font-bold">✓</span>`;
+      setTimeout(() => btn.innerHTML = iconOriginal, 1200);
     }
 
     chequearEstadoBooster();
