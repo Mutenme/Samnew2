@@ -57,9 +57,8 @@
         </div>
       </div>
 
-      <!-- Botones de Acción (Discord + Botón Booster Mejorado) -->
+      <!-- Botones de Acción -->
       <div class="flex items-center space-x-3">
-        <!-- Botón de Discord -->
         <a href="https://discord.gg/AT9Ypy2Vcc" target="_blank" class="flex items-center space-x-2 bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white text-indigo-300 font-semibold px-3.5 py-2 rounded-xl text-xs transition-all shadow-lg">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 127.14 96.36">
             <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.14c2.64-27.38-4.51-51.11-20.08-72.15ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,45.92,53.87,53,48.8,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,45.92,96.1,53,91.08,65.69,84.69,65.69Z"/>
@@ -67,18 +66,17 @@
           <span class="hidden sm:inline">Discord</span>
         </a>
 
-        <!-- Botón Verificar Booster Con Estilo Neón VIP -->
         <button 
           id="discordLoginBtn" 
           onclick="loginDiscord()" 
-          class="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl group bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-500 group-hover:from-purple-600 group-hover:to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 active:scale-95 cursor-pointer"
+          class="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl group bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-500 hover:shadow-purple-500/40 transition-all duration-300 active:scale-95 cursor-pointer"
         >
           <span class="relative px-3.5 py-2 transition-all ease-in duration-75 bg-slate-950/80 rounded-[10px] group-hover:bg-opacity-0 flex items-center space-x-2">
-            <svg class="w-4 h-4 text-pink-400 group-hover:text-white transition-colors animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-pink-400 group-hover:text-white animate-pulse" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2L2 9.5L12 22L22 9.5L12 2Z" />
             </svg>
             <span class="tracking-wide">Verificar Booster</span>
-            <span class="bg-pink-500/20 text-pink-300 text-[9px] px-1.5 py-0.5 rounded-full border border-pink-500/30 uppercase group-hover:bg-white/20 group-hover:text-white group-hover:border-transparent">0s VIP</span>
+            <span class="bg-pink-500/20 text-pink-300 text-[9px] px-1.5 py-0.5 rounded-full border border-pink-500/30 uppercase">0s VIP</span>
           </span>
         </button>
       </div>
@@ -115,12 +113,12 @@
         </button>
       </div>
 
-      <!-- Sección Desplegable de Categorías -->
+      <!-- Categorías -->
       <details class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-left shadow-lg">
         <summary class="font-bold text-sky-400 cursor-pointer flex items-center justify-between text-sm sm:text-base select-none">
           <span class="flex items-center space-x-2">
             <span>🎮</span>
-            <span>Explorar Categorías de Juegos (Más disponibles primero)</span>
+            <span>Explorar Categorías de Juegos</span>
           </span>
           <span class="text-xs text-slate-500 font-normal">Clic para desplegar ▼</span>
         </summary>
@@ -128,7 +126,6 @@
           <p class="text-xs text-slate-500">Cargando categorías...</p>
         </div>
       </details>
-
     </div>
 
     <!-- Contenedor de Cuentas -->
@@ -136,42 +133,31 @@
 
   </main>
 
-  <!-- AQUÍ ESTÁ EL SCRIPT DE JAVASCRIPT -->
   <script>
-    const API_URL = "https://api-cuentas-ibva.onrender.com/api/cuentas/buscar";
-    
-    // --- Configuración de Discord OAuth2 & Booster ---
-    const CLIENT_ID = "1519924155363889332"; // <--- Pon aquí tu Client ID de Discord
+    const API_BASE = "https://api-cuentas-ibva.onrender.com/api";
+    const CLIENT_ID = "1519924155363889332";
     const REDIRECT_URI = encodeURIComponent("https://mutenme.github.io/Samnew2/");
 
-    const COOLDOWN_SEGUNDOS = 20; 
-    let enCooldown = false;
-    let esBooster = false; // Cambiará a TRUE si la verificación da positivo
-
+    let discordUserId = null;
+    let esBooster = false;
     let todasLasCuentas = [];
 
-    // Redirección al Login de Discord
     function loginDiscord() {
-      if (!CLIENT_ID || CLIENT_ID === "TU_CLIENT_ID_DISCORD") {
-        alert("Debes configurar el CLIENT_ID de Discord en el código de index.html.");
-        return;
-      }
       const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify`;
       window.location.href = discordAuthUrl;
     }
 
-    // Verificar si el usuario regresa de autorizar en Discord
     async function chequearEstadoBooster() {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
 
       if (code) {
-        // Limpia el código de la URL
         window.history.replaceState({}, document.title, window.location.pathname);
-
         try {
-          const res = await fetch(`https://api-cuentas-ibva.onrender.com/api/auth/discord?code=${code}`);
+          const res = await fetch(`${API_BASE}/auth/discord?code=${code}`);
           const data = await res.json();
+
+          if (data.user_id) discordUserId = data.user_id;
 
           if (data.es_booster) {
             esBooster = true;
@@ -179,46 +165,38 @@
             btn.className = "relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 shadow-lg shadow-emerald-500/20";
             btn.innerHTML = `
               <span class="px-3.5 py-2 bg-slate-950/90 rounded-[10px] text-emerald-400 flex items-center space-x-2">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
                 <span>⚡ VIP Booster Activo (0s)</span>
               </span>
             `;
-            alert(`¡Bienvenido ${data.usuario}! Como Booster del servidor tienes 0s de cooldown.`);
+            alert(`¡Bienvenido ${data.usuario}! Tienes 0s de cooldown.`);
           } else {
-            alert(`Hola ${data.usuario || 'usuario'}. No detectamos un Boost activo en el servidor. El cooldown se mantiene en 20s.`);
+            alert(`Hola ${data.usuario || 'usuario'}. No detectamos Boost en el servidor. Cooldown de 20s activo.`);
           }
         } catch (e) {
-          console.error("Error al verificar status de booster:", e);
+          console.error("Error al verificar Booster:", e);
         }
       }
     }
 
-    // Cargar cuentas iniciales
     async function cargarTodasLasCuentas() {
       try {
-        const response = await fetch(`${API_URL}?juego=`);
+        const response = await fetch(`${API_BASE}/cuentas/buscar?juego=`);
         const data = await response.json();
         todasLasCuentas = data.cuentas || [];
         
         generarCategorias();
         mostrarCuentas(todasLasCuentas);
       } catch (err) {
-        console.error("Error al cargar cuentas iniciales", err);
+        console.error("Error al cargar cuentas:", err);
       }
     }
 
     function generarCategorias() {
       const contexJuegos = {};
-
       todasLasCuentas.forEach(c => {
         c.juegos.forEach(j => {
           const nombreLimpio = j.trim();
-          if (nombreLimpio) {
-            contexJuegos[nombreLimpio] = (contexJuegos[nombreLimpio] || 0) + 1;
-          }
+          if (nombreLimpio) contexJuegos[nombreLimpio] = (contexJuegos[nombreLimpio] || 0) + 1;
         });
       });
 
@@ -233,7 +211,7 @@
       catContainer.innerHTML = categoriasOrdenadas.map(([juego, cantidad]) => `
         <button 
           onclick="filtrarPorCategoria('${juego}')" 
-          class="bg-slate-800/80 hover:bg-sky-500/20 hover:border-sky-500/40 border border-slate-700/60 text-slate-300 hover:text-sky-300 text-xs px-3 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer"
+          class="bg-slate-800/80 hover:bg-sky-500/20 border border-slate-700/60 text-slate-300 text-xs px-3 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer"
         >
           <span>${juego}</span>
           <span class="bg-slate-900 text-sky-400 font-bold text-[10px] px-1.5 py-0.5 rounded-md">${cantidad}</span>
@@ -246,22 +224,12 @@
       buscarCuentas();
     }
 
-    async function buscarCuentas() {
+    function buscarCuentas() {
       const query = document.getElementById("searchInput").value.toLowerCase().trim();
-      const resContainer = document.getElementById("resultados");
-      
-      resContainer.innerHTML = `
-        <div class="col-span-full text-center py-16">
-          <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-slate-700 border-t-sky-400 mb-3"></div>
-          <p class="text-slate-400 font-medium text-sm">Buscando cuentas...</p>
-        </div>
-      `;
-
       const filtradas = todasLasCuentas.filter(c => 
         c.juegos.some(j => j.toLowerCase().includes(query)) ||
         c.usuario.toLowerCase().includes(query)
       );
-
       mostrarCuentas(filtradas);
     }
 
@@ -271,113 +239,87 @@
       if (!cuentas || cuentas.length === 0) {
         resContainer.innerHTML = `
           <div class="col-span-full text-center py-16 bg-slate-900/40 rounded-3xl border border-slate-800">
-            <svg class="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
             <p class="text-lg font-semibold text-slate-300">Sin resultados disponibles</p>
-            <p class="text-xs text-slate-500 mt-1">Prueba con otra categoría o nombre.</p>
           </div>
         `;
         return;
       }
 
-      resContainer.innerHTML = cuentas.map((c, index) => {
+      resContainer.innerHTML = cuentas.map(c => {
         const primerJuego = c.juegos[0] || "Cuenta Multijuego";
-        const masJuegos = c.juegos.slice(1);
 
         return `
-          <details class="glass-card rounded-2xl overflow-hidden group">
-            <summary class="p-5 flex items-center justify-between cursor-pointer select-none list-none hover:bg-slate-800/40 transition-colors">
-              <div class="flex items-center space-x-3">
-                <div class="bg-sky-500/10 border border-sky-500/20 p-2 rounded-xl text-sky-400">
-                  🎮
-                </div>
+          <div class="glass-card rounded-2xl overflow-hidden p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-3 mb-4">
+                <div class="bg-sky-500/10 border border-sky-500/20 p-2.5 rounded-xl text-sky-400">🎮</div>
                 <div>
-                  <h3 class="font-bold text-white text-sm sm:text-base group-hover:text-sky-300 transition-colors">
-                    ${primerJuego}
-                  </h3>
-                  <p class="text-[11px] text-slate-400">
-                    ${masJuegos.length > 0 ? `+${masJuegos.length} juegos extras incluidos` : 'Cuenta individual'}
-                  </p>
-                </div>
-              </div>
-              <span class="text-xs text-sky-400 font-semibold bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">
-                Ver Datos ▼
-              </span>
-            </summary>
-
-            <div class="p-5 pt-2 border-t border-slate-800/80 bg-slate-950/40">
-              ${masJuegos.length > 0 ? `
-                <div class="mb-4">
-                  <span class="text-[10px] uppercase font-bold text-slate-500 block mb-1">Otros juegos en la cuenta:</span>
-                  <div class="flex flex-wrap gap-1">
-                    ${masJuegos.map(j => `<span class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded-md">${j}</span>`).join('')}
-                  </div>
-                </div>
-              ` : ''}
-
-              <div class="space-y-3">
-                <div>
-                  <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Usuario</label>
-                  <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
-                    <span class="font-mono text-xs text-slate-200 truncate pr-2 select-all">${c.usuario}</span>
-                    <button onclick="copiarTexto('${c.usuario}', this)" class="text-slate-400 hover:text-sky-400 p-1 cursor-pointer" title="Copiar usuario">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Contraseña</label>
-                  <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
-                    <span class="font-mono text-xs text-slate-200 truncate pr-2 select-all">${c.password}</span>
-                    <button onclick="copiarTexto('${c.password}', this)" class="text-slate-400 hover:text-sky-400 p-1 cursor-pointer" title="Copiar contraseña">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    </button>
-                  </div>
+                  <h3 class="font-bold text-white text-base">${primerJuego}</h3>
+                  <p class="text-xs text-slate-400">Usuario: <span class="font-mono text-sky-300">${c.usuario}</span></p>
                 </div>
               </div>
 
+              <!-- Área donde se revela la Contraseña -->
+              <div id="box-pass-${c.id}" class="bg-slate-950 border border-slate-800 rounded-xl p-3 text-center mb-4">
+                <span class="text-xs text-slate-500 italic">Contraseña oculta y protegida</span>
+              </div>
             </div>
-          </details>
+
+            <button 
+              id="btn-revelar-${c.id}" 
+              onclick="solicitarRevelar(${c.id})" 
+              class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+            >
+              🔓 Revelar Contraseña
+            </button>
+          </div>
         `;
       }).join('');
     }
 
-    // Lógica de Copiado y Cooldown con Bypass Booster
-    function copiarTexto(texto, btn) {
-      if (esBooster) {
-        navigator.clipboard.writeText(texto);
-        const iconOriginal = btn.innerHTML;
-        btn.innerHTML = `<span class="text-xs text-emerald-400 font-bold">¡Copiado!</span>`;
-        setTimeout(() => btn.innerHTML = iconOriginal, 1000);
-        return;
-      }
+    // Petición Segura a la API en Render
+    async function solicitarRevelar(cuentaId) {
+      const btn = document.getElementById(`btn-revelar-${cuentaId}`);
+      const boxPass = document.getElementById(`box-pass-${cuentaId}`);
 
-      if (enCooldown) {
-        alert("⏱️ Debes esperar a que termine el cooldown para volver a copiar (O verifica tu Boost de Discord).");
-        return;
-      }
+      btn.disabled = true;
+      btn.innerText = "Verificando en servidor...";
 
-      navigator.clipboard.writeText(texto);
-      enCooldown = true;
+      try {
+        const response = await fetch(`${API_BASE}/cuentas/revelar`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cuenta_id: cuentaId,
+            user_id: discordUserId
+          })
+        });
 
-      let tiempoRestante = COOLDOWN_SEGUNDOS;
-      const iconOriginal = btn.innerHTML;
+        const data = await response.json();
 
-      const intervalo = setInterval(() => {
-        btn.innerHTML = `<span class="text-[10px] text-amber-400 font-bold">${tiempoRestante}s</span>`;
-        
-        if (tiempoRestante <= 0) {
-          clearInterval(intervalo);
-          btn.innerHTML = iconOriginal;
-          enCooldown = false;
+        if (response.ok && data.success) {
+          // Servidor autorizó la entrega
+          boxPass.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="font-mono text-xs text-emerald-400 font-bold select-all">${data.password}</span>
+              <button onclick="navigator.clipboard.writeText('${data.password}')" class="text-slate-400 hover:text-sky-400 text-xs">Copiar</button>
+            </div>
+          `;
+          btn.innerText = "✅ Contraseña Entregada";
+          btn.className = "w-full bg-slate-800 text-slate-500 font-bold py-2.5 rounded-xl text-xs cursor-not-allowed";
+        } else {
+          alert(data.detail || "Error al solicitar la contraseña.");
+          btn.disabled = false;
+          btn.innerText = "🔓 Revelar Contraseña";
         }
-        tiempoRestante--;
-      }, 1000);
+      } catch (err) {
+        console.error(err);
+        alert("Ocurrió un error al conectar con el servidor.");
+        btn.disabled = false;
+        btn.innerText = "🔓 Revelar Contraseña";
+      }
     }
 
-    // Inicialización al cargar la página
     chequearEstadoBooster();
     cargarTodasLasCuentas();
   </script>
