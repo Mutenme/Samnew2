@@ -40,7 +40,6 @@
 </head>
 <body class="text-slate-100 min-h-screen pb-12">
 
-  <!-- Navbar / Header -->
   <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-50 mb-8">
     <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-4">
       <div class="flex items-center space-x-3">
@@ -57,7 +56,6 @@
         </div>
       </div>
 
-      <!-- Botones de Acción -->
       <div class="flex items-center space-x-3">
         <a href="https://discord.gg/AT9Ypy2Vcc" target="_blank" class="flex items-center space-x-2 bg-indigo-600/20 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white text-indigo-300 font-semibold px-3.5 py-2 rounded-xl text-xs transition-all shadow-lg">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 127.14 96.36">
@@ -84,8 +82,6 @@
   </header>
 
   <main class="max-w-6xl mx-auto px-4">
-    
-    <!-- Hero / Buscador -->
     <div class="max-w-2xl mx-auto text-center mb-8">
       <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight">
         Catálogo de Cuentas
@@ -127,9 +123,7 @@
       </details>
     </div>
 
-    <!-- Contenedor de Cuentas -->
     <div id="resultados" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
   </main>
 
   <script>
@@ -137,13 +131,25 @@
     const CLIENT_ID = "1519924155363889332";
     const REDIRECT_URI = encodeURIComponent("https://mutenme.github.io/Samnew2/");
 
-    let discordUserId = null;
-    let esBooster = false;
+    let discordUserId = localStorage.getItem("discordUserId") || null;
+    let esBooster = localStorage.getItem("esBooster") === "true";
     let todasLasCuentas = [];
 
     function loginDiscord() {
       const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify`;
       window.location.href = discordAuthUrl;
+    }
+
+    function aplicarBotonBooster() {
+      if (esBooster) {
+        const btn = document.getElementById("discordLoginBtn");
+        btn.className = "relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 shadow-lg shadow-emerald-500/20";
+        btn.innerHTML = `
+          <span class="px-3.5 py-2 bg-slate-950/90 rounded-[10px] text-emerald-400 flex items-center space-x-2">
+            <span>⚡ VIP Booster Activo (0s)</span>
+          </span>
+        `;
+      }
     }
 
     async function chequearEstadoBooster() {
@@ -156,24 +162,26 @@
           const res = await fetch(`${API_BASE}/auth/discord?code=${code}`);
           const data = await res.json();
 
-          if (data.user_id) discordUserId = data.user_id;
+          if (data.user_id) {
+            discordUserId = data.user_id;
+            localStorage.setItem("discordUserId", discordUserId);
+          }
 
           if (data.es_booster) {
             esBooster = true;
-            const btn = document.getElementById("discordLoginBtn");
-            btn.className = "relative inline-flex items-center justify-center p-0.5 overflow-hidden text-xs font-bold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 shadow-lg shadow-emerald-500/20";
-            btn.innerHTML = `
-              <span class="px-3.5 py-2 bg-slate-950/90 rounded-[10px] text-emerald-400 flex items-center space-x-2">
-                <span>⚡ VIP Booster Activo (0s)</span>
-              </span>
-            `;
+            localStorage.setItem("esBooster", "true");
+            aplicarBotonBooster();
             alert(`¡Bienvenido ${data.usuario}! Tienes 0s de cooldown.`);
           } else {
+            esBooster = false;
+            localStorage.setItem("esBooster", "false");
             alert(`Hola ${data.usuario || 'usuario'}. No detectamos Boost en el servidor. Cooldown activo.`);
           }
         } catch (e) {
           console.error("Error al verificar status de booster:", e);
         }
+      } else if (esBooster) {
+        aplicarBotonBooster();
       }
     }
 
@@ -210,7 +218,7 @@
 
       catContainer.innerHTML = categoriasOrdenadas.map(([juego, cantidad]) => `
         <button 
-          onclick="filtrarPorCategoria('${juego}')" 
+          onclick="filtrarPorCategoria('${juego.replace(/'/g, "\\'")}')" 
           class="bg-slate-800/80 hover:bg-sky-500/20 hover:border-sky-500/40 border border-slate-700/60 text-slate-300 hover:text-sky-300 text-xs px-3 py-1.5 rounded-xl transition-all flex items-center space-x-1.5 cursor-pointer"
         >
           <span>${juego}</span>
@@ -310,7 +318,6 @@
       }).join('');
     }
 
-    // Solicitar contraseña a Render
     async function revelarPassword(cuentaId) {
       const btn = document.getElementById(`btn-revelar-${cuentaId}`);
       btn.disabled = true;
@@ -322,7 +329,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             cuenta_id: cuentaId,
-            user_id: discordUserId
+            user_id: esBooster ? "booster_active" : discordUserId
           })
         });
 
@@ -334,7 +341,7 @@
             <div class="flex items-center justify-between bg-slate-950 border border-emerald-500/40 rounded-xl px-3 py-2">
               <span class="font-mono text-xs text-emerald-400 truncate pr-2 select-all">${data.password}</span>
               <button onclick="copiarTexto('${data.password}', this)" class="text-slate-400 hover:text-emerald-400 p-1 cursor-pointer" title="Copiar contraseña">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
               </button>
             </div>
           `;
