@@ -135,6 +135,10 @@
     let esBooster = localStorage.getItem("esBooster") === "true";
     let todasLasCuentas = [];
 
+    // VARIABLES PARA EL COOLDOWN CON PAUSA DE VISIBILIDAD
+    let segundosRestantes = parseInt(localStorage.getItem("cooldown_restante") || "0", 10);
+    let timerInterval = null;
+
     function loginDiscord() {
       const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=identify`;
       window.location.href = discordAuthUrl;
@@ -241,6 +245,72 @@
       mostrarCuentas(filtradas);
     }
 
+    // --- MANEJO DE COOLDOWN QUE SE PAUSA SI SE CAMBIA DE PESTAÑA ---
+
+    function actualizarInterfazBotones() {
+      const botones = document.querySelectorAll(".btn-revelar-action");
+      if (segundosRestantes > 0) {
+        botones.forEach(b => {
+          b.disabled = true;
+          b.innerText = `⏱ Espera ${segundosRestantes}s (En pestaña)...`;
+        });
+      } else {
+        botones.forEach(b => {
+          b.disabled = false;
+          b.innerText = "🔓 Obtener Contraseña";
+        });
+      }
+    }
+
+    function iniciarTimer() {
+      if (timerInterval || segundosRestantes <= 0) return;
+
+      actualizarInterfazBotones();
+
+      timerInterval = setInterval(() => {
+        // Solo descuenta si la pestaña está activa y visible
+        if (!document.hidden) {
+          segundosRestantes--;
+          localStorage.setItem("cooldown_restante", segundosRestantes.toString());
+          actualizarInterfazBotones();
+
+          if (segundosRestantes <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            localStorage.removeItem("cooldown_restante");
+            actualizarInterfazBotones();
+          }
+        }
+      }, 1000);
+    }
+
+    function pausarTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    // Detectar cuando el usuario cambia de pestaña o vuelve
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        // Se fue de la pestaña -> Congelar/Pausar
+        pausarTimer();
+      } else {
+        // Volvió a la pestaña -> Reanudar desde donde quedó
+        if (segundosRestantes > 0) {
+          iniciarTimer();
+        }
+      }
+    });
+
+    function establecerCooldown(segundos) {
+      if (esBooster) return;
+      segundosRestantes = segundos;
+      localStorage.setItem("cooldown_restante", segundos.toString());
+      iniciarTimer();
+    }
+
     function mostrarCuentas(cuentas) {
       const resContainer = document.getElementById("resultados");
 
@@ -304,9 +374,10 @@
                     <button 
                       id="btn-revelar-${c.id}"
                       onclick="revelarPassword(${c.id})" 
-                      class="w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+                      ${segundosRestantes > 0 ? 'disabled' : ''}
+                      class="btn-revelar-action w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-2 rounded-xl text-xs transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      🔓 Obtener Contraseña
+                      ${segundosRestantes > 0 ? `⏱ Espera ${segundosRestantes}s...` : '🔓 Obtener Contraseña'}
                     </button>
                   </div>
                 </div>
@@ -316,9 +387,16 @@
           </details>
         `;
       }).join('');
+
+      actualizarInterfazBotones();
     }
 
     async function revelarPassword(cuentaId) {
+      if (segundosRestantes > 0) {
+        alert(`Debes permanecer en la página ${segundosRestantes} segundos más antes de solicitar otra contraseña.`);
+        return;
+      }
+
       const btn = document.getElementById(`btn-revelar-${cuentaId}`);
       btn.disabled = true;
       btn.innerText = "Solicitando...";
@@ -345,10 +423,13 @@
               </button>
             </div>
           `;
+
+          if (!esBooster) {
+            establecerCooldown(20);
+          }
         } else {
+          establecerCooldown(20);
           alert(data.detail || "Debes esperar antes de obtener otra contraseña.");
-          btn.disabled = false;
-          btn.innerText = "🔓 Obtener Contraseña";
         }
       } catch (err) {
         console.error(err);
@@ -367,6 +448,11 @@
 
     chequearEstadoBooster();
     cargarTodasLasCuentas();
+
+    // Iniciar si quedó un cooldown guardado previamente
+    if (segundosRestantes > 0 && !esBooster) {
+      iniciarTimer();
+    }
   </script>
 </body>
 </html>
